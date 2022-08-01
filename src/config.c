@@ -26,67 +26,71 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <dirent.h>
 
-int generate_fstab (p_list* list)
+char* get_uuid(char* dev)
 {
-    char* path = "/etc/fstab";
-    char* proc_entry = "proc /proc proc nosuid,noexec,nodev 0 0\n";
-    char* sysfs_entry = "sysfs /sys sysfs nosuid,noexec,nodev 0 0\n";
-    char* devpts_entry = "devpts /dev/pts devpts gid=5,mode=620 0 0\n";
-    char* tmpfs_entry = "tmpfs /run tmpfs defaults 0 0\n";
-    char* devtmpfs_entry = "devtmpfs /dev devtmpfs mode=0755,nosuid 0 0\n";
-    char* rootfs_entry = "defaults 1 1\n";
-    char* otherfs_entry = "defaults 1 2\n";
-    int fd;
+    DIR *dir = opendir("/dev/disk/by-uuid");
+    char* buff = (char*) malloc(sizeof(char) * 255);
+    int buff_size = 255;
 
+    if (dir == NULL) {
+        return NULL;
+    }
+
+    for (struct dirent* entry = readdir(dir); entry != NULL; entry = readdir(dir)) {
+        if (entry->d_type == DT_LNK) {
+
+        }
+    }
+
+    return NULL;
+}
+
+int generate_fstab(p_list *list)
+{
+    //get uids
+    //write the device
+    //write the type
+    //write oprtions
+    //dump and pass
+
+    char* fpath = "/etc/fstab";
+    FILE *file;
+    char* buff = (char*) malloc(sizeof(char) * 255);
     part* curr = list->first;
 
     if (curr == NULL) {
-        exit(EXIT_FAILURE);
+        return -1;
     }
 
-    fd = open(path, O_CREAT | O_WRONLY);
+    file = fopen(fpath, "w");
 
-    if (fd == -1) {
-        return errno;
-    }
-
-    //write all devices in fstab
     while (curr != NULL) {
-        write(fd, curr->path, strlen(curr->path));
-        write(fd, " ", 1);
-        write(fd, curr->mnt_point, strlen(curr->mnt_point));
-        write(fd, " ", 1);
-        write(fd, curr->fs, strlen(curr->fs));
-        write(fd, " ", 1);
-
-        if (strcmp(curr->mnt_point, "/") == 0) {
-            write(fd, rootfs_entry, strlen(rootfs_entry));
+        strcat(buff, "UUID=");
+        strcat(buff, get_uuid(curr->path));
+        strcat(buff, "\t");
+        strcat(buff, curr->mnt_point);
+        strcat(buff, "\t");
+        if (strcmp(curr->fs, "fat") == 0) {
+            strcat(buff, "vfat");
         }
         else {
-            write(fd, otherfs_entry, strlen(otherfs_entry));
+            strcat(buff, curr->fs);
+        }
+        strcat(buff, "\t");
+        strcat(buff, "defaults 0 ");
+        if (strcmp(curr->mnt_point, "/") == 0) {
+            strcat(buff, "1");
+        }
+        else {
+            strcat(buff, "2");
         }
 
-        curr = curr->next;
+        fwrite(buff, sizeof(char), strlen(buff), file);
     }
 
-
-    //write proc entry in fstab
-    write(fd, proc_entry, strlen(proc_entry));
-
-    //write sysfs entry
-    write(fd, sysfs_entry, strlen(sysfs_entry));
-
-    //write devpts entry
-    write(fd, devpts_entry, strlen(devpts_entry));
-
-    //write tmpfs entry
-    write(fd, tmpfs_entry, strlen(tmpfs_entry));
-
-    //write devtmpfs entry
-    write(fd, devpts_entry, strlen(devpts_entry));
-
-    close(fd);
+    fclose(file);
     return 0;
 }
 

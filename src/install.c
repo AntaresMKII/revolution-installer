@@ -56,15 +56,6 @@ int copy_sys_files(char *sq_path, char *target)
     return 0;
 }
 
-int move_boot_dir()
-{
-    if (rename("/boot2", "/boot") != 0) {
-        printf("Error moving boot directory. ERRNO: %s\n", strerror(errno));
-    }
-
-    return 0;
-}
-
 int gen_base_dir()
 {
     mkdir("/mnt/dev", 0555);
@@ -77,5 +68,3 @@ int gen_base_dir()
 
     return 0;
 }
-
-
