@@ -1,5 +1,5 @@
 /*
- * copy_sys_files.c
+ * generate_fstab.c
  */
 /*
  * This file is part of revolution-installer.
@@ -20,61 +20,73 @@
  */
 
 #include "include/revolution.h"
-#include <sys/wait.h>
-#include <unistd.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <string.h>
-#include <stdlib.h>
 #include <fcntl.h>
-#include <sys/stat.h>
+#include <errno.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
-int copy_sys_files(char *sq_path, char *target)
+int generate_fstab (p_list* list)
 {
-    int pid;
-    int stat;
-    int rc;
+    char* path = "/etc/fstab";
+    char* proc_entry = "proc /proc proc nosuid,noexec,nodev 0 0\n";
+    char* sysfs_entry = "sysfs /sys sysfs nosuid,noexec,nodev 0 0\n";
+    char* devpts_entry = "devpts /dev/pts devpts gid=5,mode=620 0 0\n";
+    char* tmpfs_entry = "tmpfs /run tmpfs defaults 0 0\n";
+    char* devtmpfs_entry = "devtmpfs /dev devtmpfs mode=0755,nosuid 0 0\n";
+    char* rootfs_entry = "defaults 1 1\n";
+    char* otherfs_entry = "defaults 1 2\n";
+    int fd;
 
-    pid = fork();
+    part* curr = list->first;
 
-    if (pid == 0) {
-        printf("Extracting image %s to %s\n", sq_path, target);
-        rc = execl("/usr/bin/unsquashfs", "revolution-unsquashfs", "-d", target, sq_path);
-        if (rc == -1) {
-            printf("Error executing unsquashfs. ERRNO: %s\n", strerror(errno));
+    if (curr == NULL) {
+        exit(EXIT_FAILURE);
+    }
+
+    fd = open(path, O_CREAT | O_WRONLY);
+
+    if (fd == -1) {
+        return errno;
+    }
+
+    //write all devices in fstab
+    while (curr != NULL) {
+        write(fd, curr->path, strlen(curr->path));
+        write(fd, " ", 1);
+        write(fd, curr->mnt_point, strlen(curr->mnt_point));
+        write(fd, " ", 1);
+        write(fd, curr->fs, strlen(curr->fs));
+        write(fd, " ", 1);
+
+        if (strcmp(curr->mnt_point, "/") == 0) {
+            write(fd, rootfs_entry, strlen(rootfs_entry));
         }
-        exit(-1);
+        else {
+            write(fd, otherfs_entry, strlen(otherfs_entry));
+        }
+
+        curr = curr->next;
     }
 
-    waitpid(pid, &stat, 0);
-    
-    if (WIFEXITED(stat)) {
-        printf("Exit status: %d\n", WEXITSTATUS(stat));
-    }
 
-    return 0;
-}
+    //write proc entry in fstab
+    write(fd, proc_entry, strlen(proc_entry));
 
-int move_boot_dir()
-{
-    if (rename("/boot2", "/boot") != 0) {
-        printf("Error moving boot directory. ERRNO: %s\n", strerror(errno));
-    }
+    //write sysfs entry
+    write(fd, sysfs_entry, strlen(sysfs_entry));
 
-    return 0;
-}
+    //write devpts entry
+    write(fd, devpts_entry, strlen(devpts_entry));
 
-int gen_base_dir()
-{
-    mkdir("/mnt/dev", 0555);
-    mkdir("/mnt/media", 0555);
-    mkdir("/mnt/mnt", 0755);
-    mkdir("/mnt/proc", 0555);
-    mkdir("/mnt/run", 0555);
-    mkdir("/mnt/sys", 0555);
-    mkdir("/mnt/tmp", 0555);
+    //write tmpfs entry
+    write(fd, tmpfs_entry, strlen(tmpfs_entry));
 
+    //write devtmpfs entry
+    write(fd, devpts_entry, strlen(devpts_entry));
+
+    close(fd);
     return 0;
 }
 

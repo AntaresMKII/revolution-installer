@@ -51,25 +51,31 @@
  */
 
 #include "include/revolution.h"
+#include <asm-generic/errno-base.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
+#include <dirent.h>
 
 #define SQ_PATH "/run/initramfs/memory/data/soviet-linux/01-core.sb"
 
-void get_str(int len, char *arr)
+// determine if the system is booted in efi mode
+int isEfi ()
 {
-	char ch;
-	register int len_incr = -1;
-	
-	do {
-	    *(arr+len_incr) = ch;
-	    len_incr++;
-    } while((ch=getchar()) != 13 && len_incr < len);
-	
-	*(arr + len) = '\0';
+    DIR *dir;
+    dir = opendir("/sys/firmware/efi/efivars");
+
+    if (dir == NULL) {
+        if (errno == ENOENT)
+            return 0;
+        else
+            return -1;
+    }
+
+    closedir(dir);
+    return 1;
 }
 
 int main (int argc, char** argv)
@@ -77,6 +83,8 @@ int main (int argc, char** argv)
 
     p_list part_list;
     part_list.first = NULL;
+
+    int efi = isEfi();
 
     printf("=== Disk Partition ===\n");
     if (dpart_loop()) {

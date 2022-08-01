@@ -62,7 +62,8 @@ int list_dev()
 
     while ((de = readdir(dir)) != NULL) {
         if (strncmp(de->d_name, "sd", 2) == 0 ||
-                strncmp(de->d_name, "nvme0",5) == 0) {
+                strncmp(de->d_name, "nvme0",5) == 0 ||
+                strncmp(de->d_name, "mmcblk", 6) == 0) {
             printf("/dev/%s\n", de->d_name);
         }
     }
