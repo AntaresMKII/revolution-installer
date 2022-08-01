@@ -48,6 +48,22 @@ int make_fs (char* fs, char* disk)
     return 0;
 }
 
+int verify_fs (char* fs)
+{
+    char *fs_list = {"ext4", "btrfs", "fat", "exfat", "ext3", "ntfs", "xfs"};
+    int fs_arr_size = 7;
+    int rc = 0;
+
+    for (int i = 0; i < fs_arr_size; i++) {
+        if (strcmp(fs, fs_list + i) != 0) {
+            rc = -1;
+            break;
+        }
+    }
+
+    return rc;
+}
+
 int fs_loop(p_list *list)
 {
     char part_path[100];
@@ -72,7 +88,7 @@ int fs_loop(p_list *list)
         if (strcmp(file_sys, "c") == 0) {
             rc = 0;
         }
-        else if (strcmp(file_sys, "ext4") != 0) {
+        else if (verify_fs(file_sys) != 0) {
             printf("This file system is not supported yet.\n");
         }
         else {
