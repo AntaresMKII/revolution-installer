@@ -64,12 +64,12 @@ int make_swap (char* disk)
 
 int verify_fs (char* fs)
 {
-    char *fs_list = {"ext4", "btrfs", "fat", "exfat", "ext3", "ntfs", "xfs", "swap"};
+    char fs_list[8][5] = {"ext4", "btrfs", "fat", "exfat", "ext3", "ntfs", "xfs", "swap"};
     int fs_arr_size = 8;
     int rc = 0;
 
     for (int i = 0; i < fs_arr_size; i++) {
-        if (strcmp(fs, fs_list + i) != 0) {
+        if (strcmp(fs, fs_list[i]) != 0) {
             rc = -1;
             break;
         }

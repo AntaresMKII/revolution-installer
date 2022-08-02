@@ -85,6 +85,7 @@ int main (int argc, char** argv)
     part_list.first = NULL;
 
     int efi = isEfi();
+    char rootdev[100];
 
     printf("=== Disk Partition ===\n");
     if (dpart_loop()) {
@@ -128,8 +129,10 @@ int main (int argc, char** argv)
     }
 
     printf("=== Setting up Boot Loader ===\n");
-    move_boot_dir();
-    create_grub_conf(&part_list);
+    gen_initrfs();
+    printf("Enter the device on which to install grub\n");
+    scanf("%s", rootdev);
+    install_grub(efi, rootdev);
 
     printf("=== Rebooting! ===\n");
     system("shutdown -r now");
