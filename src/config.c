@@ -31,20 +31,37 @@
 char* get_uuid(char* dev)
 {
     DIR *dir = opendir("/dev/disk/by-uuid");
-    char* buff = (char*) malloc(sizeof(char) * 255);
-    int buff_size = 255;
+    char* link = (char*) malloc(sizeof(char) * 256);
+    char* dev_link = (char*) malloc(sizeof(char) * 256);
+    int size;
+    char* uuid;
 
     if (dir == NULL) {
         return NULL;
     }
 
+    if (link == NULL || dev_link == NULL)
+        return NULL;
+
+
     for (struct dirent* entry = readdir(dir); entry != NULL; entry = readdir(dir)) {
         if (entry->d_type == DT_LNK) {
+            strcpy(link, "/dev/disk/by-uuid");
+            strcat(link, entry->d_name);
 
+            size = readlink(link, dev_link, 256);
+
+            if (size > -1 && strcmp(dev, dev_link) == 0) {
+                uuid = (char*) malloc(size);
+                if (uuid == NULL)
+                    return NULL;
+                strcpy(uuid, entry->d_name);
+                break;
+            }
         }
     }
 
-    return NULL;
+    return uuid;
 }
 
 int generate_fstab(p_list *list)
