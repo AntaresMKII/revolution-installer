@@ -25,6 +25,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/wait.h>
 #include <unistd.h>
 #include <dirent.h>
 
@@ -111,64 +112,40 @@ int generate_fstab(p_list *list)
     return 0;
 }
 
-int create_grub_conf(p_list* list)
+int install_grub(int efi, char* rootdev)
 {
-    part* root = list->first;
-    char* path = "/boot/grub/grub.cfg";
-    int fd;
-    char* buff;
-    char* grub_disk; //for grub disk format
-    char sndlast;
+    char* command = "/usr/sbin/grub-install";
+    int pid;
 
-    while (root != NULL) {
-        if (strcmp(root->mnt_point, "/")) {
-            break;
+    pid = fork();
+    if (pid == 0) {
+        if (efi) {
+            execl(command, "grub-install",
+                    "--target=x86_64-efi",
+                    "--efi-directory=/boot/efi",
+                    "--bootloader-id=SOVIET");
         }
-
-        root = root->next;
+        else {
+            execl(command, "grub-install",
+                    "--target=i386-pc",
+                    rootdev);
+        }
     }
 
-    if (root == NULL) {
-        return -1;
+    waitpid(pid, NULL, 0);
+    return 0;
+}
+
+int gen_initrfs()
+{
+    char* command = "/usr/bin/dracut";
+    int pid;
+
+    pid = fork();
+    if (pid == 0) {
+        execl(command, "revolution-dracut");
     }
 
-    //this is not the best way to do this... Will need some rework
-
-    fd = open(path, O_CREAT | O_WRONLY);
-
-    buff = "set default=0\nset timeout=5\n\ninsmod ext2\nset root=";
-    write(fd, buff, strlen(buff));
-
-    sndlast = root->path[strlen(root->path) -2];
-
-    if (sndlast == 'a') {
-        sndlast = '0';
-    }
-    else if (sndlast == 'b') {
-        sndlast = '1';
-    }
-    else if (sndlast == 'c') {
-        sndlast = '2';
-    }
-    else {
-        printf("This program can't count above 3! You will have to configure the rest of %s by yourself.\n", path);
-    }
-
-    grub_disk = (char*) malloc(7);
-    grub_disk = strcat("(hd", &sndlast);
-    grub_disk = strcat(grub_disk, &root->path[strlen(root->path)-1]);
-    grub_disk = strcat(grub_disk, ")");
-
-    buff = grub_disk;
-    write(fd, buff, strlen(buff));
-
-    buff = "\n\nmenuentry \"Soviet Linux\" {\n\tlinux /boot/vmlinuz root=";
-    write(fd, buff, strlen(buff));
-    write(fd, root->path, strlen(root->path));
-
-    buff = " ro\n}";
-
-    close(fd);
-
+    waitpid(pid, NULL, 0);
     return 0;
 }
