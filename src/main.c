@@ -59,7 +59,7 @@
 #include <errno.h>
 #include <dirent.h>
 
-#define SQ_PATH "/run/initramfs/memory/data/soviet-linux/01-core.sb"
+#define SQ_PATH "/media/rootfs.sfs"
 
 // determine if the system is booted in efi mode
 int isEfi ()

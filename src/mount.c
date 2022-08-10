@@ -103,8 +103,6 @@ int mount_setup(p_list *list)
         }
     }
 
-    free(curr);
-
     return 0;
 }
 

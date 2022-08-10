@@ -69,8 +69,8 @@ int verify_fs (char* fs)
     int rc = 0;
 
     for (int i = 0; i < fs_arr_size; i++) {
-        if (strcmp(fs, fs_list[i]) != 0) {
-            rc = -1;
+        if (strcmp(fs, fs_list[i]) == 0) {
+            rc = 1;
             break;
         }
     }
@@ -84,7 +84,8 @@ int fs_loop(p_list *list)
     char file_sys[100];
     char sel;
     int rc = 1;
-    part *curr;
+    part* curr;
+    part* prev;
 
     do {
         printf("Enter a partition for file system creation: (c to continue, l to list disks): ");
@@ -95,6 +96,7 @@ int fs_loop(p_list *list)
         }
         else if (strcmp(part_path, "l") == 0) {
             list_dev();
+            continue;
         }
 
         printf("Enter a file system to use (c to continue, l to list supported file systems): ");
@@ -103,14 +105,14 @@ int fs_loop(p_list *list)
             rc = 0;
         }
         else if (strcmp(file_sys, "l") == 0) {
-            printf("Supported file systems: ext4, btrfs, fat, exfat, ext3, ntfs, xfs, swap");
+            printf("Supported file systems: ext4, btrfs, fat, exfat, ext3, ntfs, xfs, swap\n");
+            continue;
         }
-        else if (verify_fs(file_sys) != 0) {
+        else if (!verify_fs(file_sys)) {
             printf("This file system is not supported yet.\n");
         }
         else {
             if (strcmp(file_sys, "swap") != 0) {
-            
                 make_fs(file_sys, part_path);
             }
             else {
@@ -131,8 +133,12 @@ int fs_loop(p_list *list)
             if (list->first == NULL) {
                 list->first = curr;
             }
+            else {
+                prev->next = curr;
+            }
 
-            curr = curr->next;
+            prev = curr;
+            curr = NULL;
         }
 
     } while (rc);
