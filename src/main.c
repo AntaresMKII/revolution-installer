@@ -112,7 +112,7 @@ int main (int argc, char** argv)
     mount_dev(&part_list);
 
     printf("=== Extracting Squashfs Image ===\n");
-    copy_sys_files(SQ_PATH, "/mnt/soviet/");
+    copy_sys_files(SQ_PATH, "/mnt/");
 
     printf("=== Mounting Virtual Kernel File System ===\n");
     if (mount_virtkfs() == -1) {
@@ -121,7 +121,7 @@ int main (int argc, char** argv)
     }
 
     printf("=== Entering chroot Environment ===\n");
-    chroot("/mnt/soviet/");
+    chroot("/mnt/");
 
     printf("=== Generating fs tab ===\n");
     if (0 != generate_fstab(&part_list)) {
