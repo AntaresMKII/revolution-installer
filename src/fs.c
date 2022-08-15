@@ -40,7 +40,10 @@ int make_fs (char* fs, char* disk)
 
     pid = fork();
     if (pid == 0) {
-        execl(command, "revolution-mkfs", fs_arg, disk);
+        if (strcmp(fs_arg, "fat") != 0)
+            execl(command, "revolution-mkfs", fs_arg, disk);
+        else
+            execl(command, "revolution-mkfs", fs_arg, "-F", "32", disk);
     }
 
     waitpid(pid, NULL, 0);

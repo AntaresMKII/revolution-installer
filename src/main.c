@@ -112,7 +112,7 @@ int main (int argc, char** argv)
     mount_dev(&part_list);
 
     printf("=== Extracting Squashfs Image ===\n");
-    copy_sys_files(SQ_PATH, "/mnt/");
+    copy_sys_files(SQ_PATH, "/mnt");
 
     printf("=== Mounting Virtual Kernel File System ===\n");
     if (mount_virtkfs() == -1) {

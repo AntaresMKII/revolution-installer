@@ -40,7 +40,7 @@ int copy_sys_files(char *sq_path, char *target)
 
     if (pid == 0) {
         printf("Extracting image %s to %s\n", sq_path, target);
-        rc = execl("/usr/bin/unsquashfs", "revolution-unsquashfs", "-d", target, sq_path);
+        rc = execl("/usr/bin/unsquashfs", "revolution-unsquashfs", "-f", "-d", target, sq_path);
         if (rc == -1) {
             printf("Error executing unsquashfs. ERRNO: %s\n", strerror(errno));
         }
