@@ -105,14 +105,14 @@ int main (int argc, char** argv)
     printf("=== Mounting Root File System ===\n");
     mount_root(&part_list);
 
-    printf("=== Mounting Remaining Devices ===\n");
-    mount_dev(&part_list);
-
     printf("=== Generating Base Directories ===\n");
     gen_base_dir();
 
+    printf("=== Mounting Remaining Devices ===\n");
+    mount_dev(&part_list);
+
     printf("=== Extracting Squashfs Image ===\n");
-    copy_sys_files(SQ_PATH, "/mnt/");
+    copy_sys_files(SQ_PATH, "/mnt/soviet/");
 
     printf("=== Mounting Virtual Kernel File System ===\n");
     if (mount_virtkfs() == -1) {
@@ -121,7 +121,7 @@ int main (int argc, char** argv)
     }
 
     printf("=== Entering chroot Environment ===\n");
-    chroot("/mnt/");
+    chroot("/mnt/soviet/");
 
     printf("=== Generating fs tab ===\n");
     if (0 != generate_fstab(&part_list)) {
@@ -134,8 +134,6 @@ int main (int argc, char** argv)
     scanf("%s", rootdev);
     install_grub(efi, rootdev);
 
-    printf("=== Rebooting! ===\n");
-    system("shutdown -r now");
-
+    printf("DONE!\n");
     return 0;
 }

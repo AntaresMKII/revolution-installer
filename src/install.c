@@ -58,13 +58,13 @@ int copy_sys_files(char *sq_path, char *target)
 
 int gen_base_dir()
 {
-    mkdir("/mnt/dev", 0555);
-    mkdir("/mnt/media", 0555);
-    mkdir("/mnt/mnt", 0755);
-    mkdir("/mnt/proc", 0555);
-    mkdir("/mnt/run", 0555);
-    mkdir("/mnt/sys", 0555);
-    mkdir("/mnt/tmp", 0555);
-
+    mkdir("/mnt/soviet/dev", 0555);
+    mkdir("/mnt/soviet/media", 0555);
+    mkdir("/mnt/soviet/mnt", 0755);
+    mkdir("/mnt/soviet/proc", 0555);
+    mkdir("/mnt/soviet/run", 0555);
+    mkdir("/mnt/soviet/sys", 0555);
+    mkdir("/mnt/soviet/tmp", 0555);
+    mkdir("/mnt/soviet/bood", 0755);
     return 0;
 }
