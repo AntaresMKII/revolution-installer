@@ -51,25 +51,31 @@
  */
 
 #include "include/revolution.h"
+#include <asm-generic/errno-base.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
+#include <dirent.h>
 
-#define SQ_PATH "/run/initramfs/memory/data/soviet-linux/01-core.sb"
+#define SQ_PATH "/media/rootfs.sfs"
 
-void get_str(int len, char *arr)
+// determine if the system is booted in efi mode
+int isEfi ()
 {
-	char ch;
-	register int len_incr = -1;
-	
-	do {
-	    *(arr+len_incr) = ch;
-	    len_incr++;
-    } while((ch=getchar()) != 13 && len_incr < len);
-	
-	*(arr + len) = '\0';
+    DIR *dir;
+    dir = opendir("/sys/firmware/efi/efivars");
+
+    if (dir == NULL) {
+        if (errno == ENOENT)
+            return 0;
+        else
+            return -1;
+    }
+
+    closedir(dir);
+    return 1;
 }
 
 int main (int argc, char** argv)
@@ -77,6 +83,9 @@ int main (int argc, char** argv)
 
     p_list part_list;
     part_list.first = NULL;
+
+    int efi = isEfi();
+    char rootdev[100];
 
     printf("=== Disk Partition ===\n");
     if (dpart_loop()) {
@@ -96,14 +105,14 @@ int main (int argc, char** argv)
     printf("=== Mounting Root File System ===\n");
     mount_root(&part_list);
 
-    printf("=== Mounting Remaining Devices ===\n");
-    mount_dev(&part_list);
-
     printf("=== Generating Base Directories ===\n");
     gen_base_dir();
 
+    printf("=== Mounting Remaining Devices ===\n");
+    mount_dev(&part_list);
+
     printf("=== Extracting Squashfs Image ===\n");
-    copy_sys_files(SQ_PATH, "/mnt/");
+    copy_sys_files(SQ_PATH, "/mnt");
 
     printf("=== Mounting Virtual Kernel File System ===\n");
     if (mount_virtkfs() == -1) {
@@ -120,11 +129,11 @@ int main (int argc, char** argv)
     }
 
     printf("=== Setting up Boot Loader ===\n");
-    move_boot_dir();
-    create_grub_conf(&part_list);
+    gen_initrfs();
+    printf("Enter the device on which to install grub\n");
+    scanf("%s", rootdev);
+    install_grub(efi, rootdev);
 
-    printf("=== Rebooting! ===\n");
-    system("shutdown -r now");
-
+    printf("DONE!\n");
     return 0;
 }
