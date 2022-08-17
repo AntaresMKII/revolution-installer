@@ -27,7 +27,7 @@
 #include <sys/stat.h>
 #include <sys/swap.h>
 
-#define MNT "/mnt/soviet"
+#define MNT "/mnt"
 
 int mount_dev(p_list *list)
 {
