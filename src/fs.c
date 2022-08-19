@@ -40,8 +40,8 @@ int make_fs (char* fs, char* disk)
 
     pid = fork();
     if (pid == 0) {
-        if (strcmp(fs_arg, "fat") != 0)
-            execl(command, "revolution-mkfs", fs_arg, disk);
+        if (strcmp(fs_arg, "vfat") != 0)
+            execl(command, "revolution-mkfs", "-f", fs_arg, disk);
         else
             execl(command, "revolution-mkfs", fs_arg, "-F", "32", disk);
     }
@@ -67,7 +67,7 @@ int make_swap (char* disk)
 
 int verify_fs (char* fs)
 {
-    char fs_list[8][5] = {"ext4", "btrfs", "fat", "exfat", "ext3", "ntfs", "xfs", "swap"};
+    char fs_list[8][5] = {"ext4", "btrfs", "vfat", "exfat", "ext3", "ntfs", "xfs", "swap"};
     int fs_arr_size = 8;
     int rc = 0;
 
@@ -108,7 +108,7 @@ int fs_loop(p_list *list)
             rc = 0;
         }
         else if (strcmp(file_sys, "l") == 0) {
-            printf("Supported file systems: ext4, btrfs, fat, exfat, ext3, ntfs, xfs, swap\n");
+            printf("Supported file systems: ext4, btrfs, vfat, exfat, ext3, ntfs, xfs, swap\n");
             continue;
         }
         else if (!verify_fs(file_sys)) {
