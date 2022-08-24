@@ -28,8 +28,7 @@
 int make_fs (char* fs, char* disk)
 {
     char* command = "/usr/sbin/mkfs";
-    int pid, status;
-    int rc;
+    int pid;
     char* fs_arg = (char*) malloc(strlen(fs) + 3);
     if (fs_arg == NULL) {
         return -1;
@@ -41,15 +40,15 @@ int make_fs (char* fs, char* disk)
 
     pid = fork();
     if (pid == 0) {
-        if (strcmp(fs, "vfat") == 0)
-            execl(command, "revolution-mkfs", fs_arg, disk);
-        else if (strcmp(fs, "ext4") == 0)
-            execl(command, "revolution-mkfs", fs_arg, disk);
+        if (strcmp(fs_arg, "vfat") != 0)
+            execl(command, "revolution-mkfs", "-f", fs_arg, disk);
+        else
+            execl(command, "revolution-mkfs", fs_arg, "-F", "32", disk);
     }
 
-    waitpid(pid, &status, 0);
+    waitpid(pid, NULL, 0);
     free(fs_arg);
-    return status;
+    return 0;
 }
 
 int make_swap (char* disk)
@@ -58,7 +57,7 @@ int make_swap (char* disk)
     int pid;
 
     pid = fork();
-    if (pid == 0) {
+    if (pid ==0) {
         execl(command, "revolution-mkswap", disk);
     }
 
