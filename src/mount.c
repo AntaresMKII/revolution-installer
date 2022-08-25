@@ -27,7 +27,8 @@
 #include <sys/stat.h>
 #include <sys/swap.h>
 
-#define MNT "/mnt"
+//assuming this is where everything mounts unless specified elsewhere in code, I just changed this and hope it works. - Kat
+#define MNT "/mnt/soviet/"
 
 int mount_dev(p_list *list)
 {
@@ -106,13 +107,15 @@ int mount_setup(p_list *list)
     return 0;
 }
 
+
+//this is what I mean by "unless specified otherwise", had to change this seperately. - Kat
 int mount_virtkfs()
 {
-    char* dev_dir = "/mnt/dev";
-    char* dev_pts = "/mnt/dev/pts";
-    char* proc = "/mnt/proc";
-    char* sysfs = "/mnt/sys";
-    char* tmpfs = "/mnt/run";
+    char* dev_dir = "/mnt/soviet/dev";
+    char* dev_pts = "/mnt/soviet/dev/pts";
+    char* proc = "/mnt/soviet/proc";
+    char* sysfs = "/mnt/soviet/sys";
+    char* tmpfs = "/mnt/soviet/run";
 
     int rc = 0;
 
