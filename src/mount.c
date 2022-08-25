@@ -39,14 +39,32 @@ int mount_dev(p_list *list)
         if (curr->mnt_point != NULL &&
             strcmp(curr->mnt_point, "/") != 0) {
 
-            if (strcmp(curr->fs, "swap")) {
+            if (strcmp(curr->fs, "swap") != 0) {
                 strcat(mnt_point, curr->mnt_point);
                 mkdir(mnt_point, 0777);
                 mount(curr->path, mnt_point, curr->fs, 0, NULL);
+                strcpy(mnt_point, MNT);
             }
             else {
                  swapon(curr->path, 0);
             }
+        }
+
+        curr = curr->next;
+    }
+
+    return 0;
+}
+
+int mount_boot(p_list *list)
+{
+    part *curr = list->first;
+    char *mnt_point = MNT;
+
+    while (curr != NULL) {
+        if (strcmp(curr->mnt_point, "/boot") == 0) {
+            mount(curr->path, mnt_point, curr->fs, 0, NULL);
+            break;
         }
 
         curr = curr->next;

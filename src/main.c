@@ -108,6 +108,9 @@ int main (int argc, char** argv)
     printf("=== Generating Base Directories ===\n");
     gen_base_dir();
 
+    printf("=== Mounting Boot Partition ===\n");
+    mount_boot(&part_list);
+
     printf("=== Mounting Remaining Devices ===\n");
     mount_dev(&part_list);
 
