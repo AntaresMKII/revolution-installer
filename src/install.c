@@ -65,6 +65,6 @@ int gen_base_dir()
     mkdir("/mnt/run", 0555);
     mkdir("/mnt/sys", 0555);
     mkdir("/mnt/tmp", 0555);
-    mkdir("/mnt/bood", 0755);
+    mkdir("/mnt/boot", 0755);
     return 0;
 }
