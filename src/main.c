@@ -89,7 +89,7 @@ int main (int argc, char** argv)
 
     printf("=== Disk Partition ===\n");
     if (dpart_loop()) {
-        printf("Error partitioning drive\nQuitting...\n");
+        printf("Error partitioning disk\nQuitting...\n");
         exit(EXIT_FAILURE);
     }
 
@@ -108,7 +108,7 @@ int main (int argc, char** argv)
     printf("=== Generating Base Directories ===\n");
     gen_base_dir();
 
-    printf("=== Mounting Remaining Devices ===\n");
+    printf("=== Mounting Remaining Disks ===\n");
     mount_dev(&part_list);
 
     printf("=== Extracting Squashfs Image ===\n");
@@ -116,21 +116,21 @@ int main (int argc, char** argv)
 
     printf("=== Mounting Virtual Kernel File System ===\n");
     if (mount_virtkfs() == -1) {
-        printf("Error Mounting virtual kernel file system. ERRNO: %s\n", strerror(errno));
+        printf("Error mounting Virtual Kernel File System. ERRNO: %s\n", strerror(errno));
         exit(EXIT_FAILURE);
     }
 
     printf("=== Entering chroot Environment ===\n");
     chroot("/mnt/");
 
-    printf("=== Generating fs tab ===\n");
+    printf("=== Generating fstab ===\n");
     if (0 != generate_fstab(&part_list)) {
         printf("Error generating fstab. ERRNO:%s\n", strerror(errno));
     }
 
     printf("=== Setting up Boot Loader ===\n");
     gen_initrfs();
-    printf("Enter the device on which to install grub\n");
+    printf("Enter the disk on which to install GRUB\n");
     scanf("%s", rootdev);
     install_grub(efi, rootdev);
 
