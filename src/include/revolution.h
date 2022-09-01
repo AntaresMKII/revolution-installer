@@ -22,6 +22,7 @@ extern int mount_setup(p_list *list);
 extern int mount_virtkfs();
 extern int mount_dev(p_list *list);
 extern int mount_root(p_list *list);
+extern int mount_boot(p_list *list);
 
 // file system creation
 extern int fs_loop(p_list *list);

@@ -107,12 +107,15 @@ int main (int argc, char** argv)
 
     printf("=== Generating Base Directories ===\n");
     gen_base_dir();
-
+    
+    printf("=== Mounting Boot Partition ===\n");
+    mount_boot(&part_list);
+    
     printf("=== Mounting Remaining Disks ===\n");
     mount_dev(&part_list);
 
     printf("=== Extracting Squashfs Image ===\n");
-    copy_sys_files(SQ_PATH, "/mnt");
+    copy_sys_files(SQ_PATH, "/mnt/soviet/");
 
     printf("=== Mounting Virtual Kernel File System ===\n");
     if (mount_virtkfs() == -1) {
@@ -121,7 +124,7 @@ int main (int argc, char** argv)
     }
 
     printf("=== Entering chroot Environment ===\n");
-    chroot("/mnt/");
+    chroot("/mnt/soviet/");
 
     printf("=== Generating fstab ===\n");
     if (0 != generate_fstab(&part_list)) {
