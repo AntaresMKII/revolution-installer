@@ -5,9 +5,16 @@
 #ifndef REVOLUTION_H
 #define REVOLUTION_H
 
+// Debug:
+// #define DEBUG 1
+#ifdef DEBUG
+#define SQ_PATH //put the test path for the squashfs image here
+#endif
 
 // Defines :
+#ifndef DEBUG
 #define SQ_PATH "/media/rootfs.sfs"
+#endif
 #define MNT "/mnt/soviet"
 
 // Includes :
