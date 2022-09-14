@@ -19,15 +19,9 @@
  * Copyright 2022 AntaresMKII
  */
 #include "include/revolution.h"
-#include <stdio.h>
-#include <sys/wait.h>
-#include <unistd.h>
-#include <string.h>
-#include <stdlib.h>
 
 int make_fs (char* fs, char* disk)
 {
-    char* command = "/usr/sbin/mkfs";
     int pid;
     char* fs_arg = (char*) malloc(strlen(fs) + 3);
     if (fs_arg == NULL) {
@@ -40,7 +34,7 @@ int make_fs (char* fs, char* disk)
 
     pid = fork();
     if (pid == 0) {
-        execl(command, "revolution-mkfs", fs_arg,  disk);
+        execl("/usr/sbin/mkfs", "revolution-mkfs", fs_arg,  disk);
     }
 
     waitpid(pid, NULL, 0);
@@ -50,12 +44,11 @@ int make_fs (char* fs, char* disk)
 
 int make_swap (char* disk)
 {
-    char* command = "/usr/sbin/mkswap";
     int pid;
 
     pid = fork();
     if (pid ==0) {
-        execl(command, "revolution-mkswap", disk);
+        execl("/usr/sbin/mkswap", "revolution-mkswap", disk);
     }
 
     waitpid(pid, NULL, 0);
@@ -88,8 +81,8 @@ int fs_loop(p_list *list)
     part* prev;
 
     do {
-        printf("Enter a partition for file system creation: (c to continue, l to list disks): ");
-        scanf("%s", part_path);
+        puts("Enter a partition for file system creation: (c to continue, l to list disks): ");
+        part_path = my_input();
         if (strcmp(part_path, "c") == 0) {
             rc = 0;
             break;
@@ -99,17 +92,17 @@ int fs_loop(p_list *list)
             continue;
         }
 
-        printf("Enter a file system to use (c to continue, l to list supported file systems): ");
-        scanf("%s", file_sys);
+        puts("Enter a file system to use (c to continue, l to list supported file systems): ");
+        file_sys = my_input();
         if (strcmp(file_sys, "c") == 0) {
             rc = 0;
         }
         else if (strcmp(file_sys, "l") == 0) {
-            printf("Supported file systems: ext4, btrfs, vfat, exfat, ext3, ntfs, xfs, swap\n");
+            puts("Supported file systems: ext4, btrfs, vfat, exfat, ext3, ntfs, xfs, swap");
             continue;
         }
         else if (!verify_fs(file_sys)) {
-            printf("This file system is not supported yet.\n");
+            puts("This file system is not supported yet.");
         }
         else {
             if (strcmp(file_sys, "swap") != 0) {

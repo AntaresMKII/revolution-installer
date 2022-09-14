@@ -19,16 +19,6 @@
  * Copyright 2022 AntaresMKII
  */
 #include "include/revolution.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/mount.h>
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <sys/swap.h>
-
-//assuming this is where everything mounts unless specified elsewhere in code, I just changed this and hope it works. - Kat
-#define MNT "/mnt/soviet/"
 
 int mount_dev(p_list *list)
 {
@@ -100,15 +90,15 @@ int mount_setup(p_list *list)
         return 1;
     }
 
-    printf("Choose the mounting point for the following partitions.\n");
-    printf("You can continue to the next step by entering c.\n");
+    puts("Choose the mounting point for the following partitions.");
+    puts("You can continue to the next step by entering c.");
 
     while (curr != NULL) {
         printf("Partition %s of type %s :", curr->path, curr->fs);
-        scanf("%s", mnt_point);
+        mnt_point = my_input();
 
         if (strcmp(mnt_point, "c") == 0) {
-            printf("Remaining partitions will not be mounted\n");
+            puts("Remaining partitions will not be mounted");
             break;
         }
         else {
@@ -129,11 +119,17 @@ int mount_setup(p_list *list)
 //this is what I mean by "unless specified otherwise", had to change this seperately. - Kat
 int mount_virtkfs()
 {
-    char* dev_dir = "/mnt/soviet/dev";
-    char* dev_pts = "/mnt/soviet/dev/pts";
-    char* proc = "/mnt/soviet/proc";
-    char* sysfs = "/mnt/soviet/sys";
-    char* tmpfs = "/mnt/soviet/run";
+    char* dev_dir = MNT;
+    char* dev_pts = MNT;
+    char* proc = MNT;
+    char* sysfs = MNT;
+    char* tmpfs = MNT;
+
+    strcat(dev_dir, "/dev");
+    strcat(dev_pts, "/dev/pts");
+    strcat(proc, "/proc");
+    strcat(sysfs, "/sys");
+    strcat(tmpfs, "/tmpfs");
 
     int rc = 0;
 

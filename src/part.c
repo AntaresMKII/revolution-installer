@@ -19,12 +19,6 @@
  * Copyright 2022 AntaresMKII
  */
 #include "include/revolution.h"
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/wait.h>
-#include <dirent.h>
 
 int partition_disk (char* disk)
 {
@@ -79,7 +73,7 @@ int dpart_loop()
 
     do {
         printf("Enter a disk to edit (c to continue, l to list disks): ");
-        scanf("%s", disk_path);
+        disk_path = my_input();
         if (strcmp(disk_path, "c") == 0) {
             rc = 0;
         }

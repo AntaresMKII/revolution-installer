@@ -51,15 +51,7 @@
  */
 
 #include "include/revolution.h"
-#include <asm-generic/errno-base.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <errno.h>
-#include <dirent.h>
-
-#define SQ_PATH "/media/rootfs.sfs"
+#include "include/util.h"
 
 // determine if the system is booted in efi mode
 int isEfi ()
@@ -78,6 +70,22 @@ int isEfi ()
     return 1;
 }
 
+void cleanup (p_list *list)
+{
+    part *curr = list->first;
+    part *next;
+    while (curr != NULL) {
+        next = curr->next;
+        free(curr->path);
+        free(curr->mnt_point);
+        free(curr->fs);
+        free(curr);
+        curr = next;
+    }
+
+    free(list);
+}
+
 int main (int argc, char** argv)
 {
 
@@ -87,56 +95,58 @@ int main (int argc, char** argv)
     int efi = isEfi();
     char rootdev[100];
 
-    printf("=== Disk Partition ===\n");
+    puts("=== Disk Partition ===");
     if (dpart_loop()) {
-        printf("Error partitioning disk\nQuitting...\n");
+        puts("Error partitioning disk\nQuitting...");
         exit(EXIT_FAILURE);
     }
 
-    printf("=== File System Creation ===\n");
+    puts("=== File System Creation ===");
     if (fs_loop(&part_list)) {
-        printf("Error creating file system!\n Quitting...\n");
+        puts("Error creating file system!\n Quitting...");
         exit(EXIT_FAILURE);
     }
 
-    printf("=== Mount Setup ===\n");
+    puts("=== Mount Setup ===");
     mount_setup(&part_list);
 
-    printf("=== Mounting Root File System ===\n");
+    puts("=== Mounting Root File System ===");
     mount_root(&part_list);
 
-    printf("=== Generating Base Directories ===\n");
+    puts("=== Generating Base Directories ===");
     gen_base_dir();
     
-    printf("=== Mounting Boot Partition ===\n");
+    puts("=== Mounting Boot Partition ===");
     mount_boot(&part_list);
     
-    printf("=== Mounting Remaining Disks ===\n");
+    puts("=== Mounting Remaining Disks ===");
     mount_dev(&part_list);
 
-    printf("=== Extracting Squashfs Image ===\n");
-    copy_sys_files(SQ_PATH, "/mnt/soviet/");
+    puts("=== Extracting Squashfs Image ===");
+    copy_sys_files(SQ_PATH, MNT);
 
-    printf("=== Mounting Virtual Kernel File System ===\n");
+    puts("=== Mounting Virtual Kernel File System ===");
     if (mount_virtkfs() == -1) {
         printf("Error mounting Virtual Kernel File System. ERRNO: %s\n", strerror(errno));
         exit(EXIT_FAILURE);
     }
 
-    printf("=== Entering chroot Environment ===\n");
-    chroot("/mnt/soviet/");
+    puts("=== Entering chroot Environment ===");
+    chroot(MNT);
 
-    printf("=== Generating fstab ===\n");
+    puts("=== Generating fstab ===");
     if (0 != generate_fstab(&part_list)) {
         printf("Error generating fstab. ERRNO:%s\n", strerror(errno));
     }
 
-    printf("=== Setting up Boot Loader ===\n");
+    puts("=== Setting up Boot Loader ===");
     gen_initrfs();
-    printf("Enter the disk on which to install GRUB\n");
-    scanf("%s", rootdev);
+    puts("Enter the disk on which to install GRUB");
+    rootdev = my_input();
     install_grub(efi, rootdev);
 
-    printf("DONE!\n");
+    cleanup(&part_list);
+
+    puts("DONE!");
     return 0;
 }

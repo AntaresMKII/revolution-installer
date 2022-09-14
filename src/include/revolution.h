@@ -2,6 +2,28 @@
  * revolution.h
  */
 
+#ifndef REVOLUTION_H
+#define REVOLUTION_H
+
+
+// Defines :
+#define SQ_PATH "/media/rootfs.sfs"
+#define MNT "/mnt/soviet"
+
+// Includes :
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/mount.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#include <errno.h>
+#include <dirent.h>
+#include <sys/swap.h>
+
+// Structures :
 typedef struct partition_node {
     char* path;
     char* mnt_point;
@@ -13,6 +35,7 @@ typedef struct partition_list {
     part *first;
 } p_list;
 
+// Prototypes :
 // disk partition
 extern int dpart_loop();
 extern int list_dev();
@@ -35,3 +58,5 @@ extern int gen_base_dir();
 extern int generate_fstab(p_list *list);
 extern int install_grub(int efi, char* rootdev);
 extern int gen_initrfs();
+
+#endif

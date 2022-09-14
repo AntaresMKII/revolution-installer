@@ -61,19 +61,15 @@ char* get_uuid(char* dev)
             }
         }
     }
+    
+    free(link);
+    free(dev_link);
 
     return uuid;
 }
 
-int generate_fstab(p_list *list)
+int generate_fstab (p_list *list)
 {
-    //get uids
-    //write the device
-    //write the type
-    //write oprtions
-    //dump and pass
-
-    char* fpath = "/etc/fstab";
     FILE *file;
     char* buff = (char*) malloc(sizeof(char) * 255);
     part* curr = list->first;
@@ -82,7 +78,7 @@ int generate_fstab(p_list *list)
         return -1;
     }
 
-    file = fopen(fpath, "w");
+    file = fopen("/etc/fstab", "w");
 
     while (curr != NULL) {
         strcat(buff, "UUID=");
@@ -109,6 +105,7 @@ int generate_fstab(p_list *list)
     }
 
     fclose(file);
+    free(buff);
     return 0;
 }
 

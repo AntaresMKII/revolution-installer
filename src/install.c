@@ -20,15 +20,6 @@
  */
 
 #include "include/revolution.h"
-#include <sys/wait.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <string.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <sys/stat.h>
 
 int copy_sys_files(char *sq_path, char *target)
 {
