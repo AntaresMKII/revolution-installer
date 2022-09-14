@@ -1,3 +1,5 @@
+# THIS REPOSITORY IS FOR BACKUP ONLY! PLEASE CONTRIBUTE ON OUR GITLAB
+
 # revolution-installer
 
 The installer of the Soviet-Linux operating system written in C.
