@@ -51,7 +51,6 @@
  */
 
 #include "include/revolution.h"
-#include "include/util.h"
 
 // determine if the system is booted in efi mode
 int isEfi ()
@@ -93,7 +92,7 @@ int main (int argc, char** argv)
     part_list.first = NULL;
 
     int efi = isEfi();
-    char rootdev[100];
+    char* rootdev;
 
     puts("=== Disk Partition ===");
     if (dpart_loop()) {

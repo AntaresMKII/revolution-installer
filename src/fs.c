@@ -73,8 +73,8 @@ int verify_fs (char* fs)
 
 int fs_loop(p_list *list)
 {
-    char part_path[100];
-    char file_sys[100];
+    char* part_path;
+    char* file_sys;
     char sel;
     int rc = 1;
     part* curr;

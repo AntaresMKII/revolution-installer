@@ -1,4 +1,4 @@
-#include "../include/my_input.h"
+#include "include/my_input.h"
 
 int my_exit(int val)
 {

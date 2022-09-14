@@ -68,7 +68,7 @@ int list_dev()
 
 int dpart_loop()
 {
-    char disk_path[100];
+    char* disk_path;
     int rc = 1;
 
     do {

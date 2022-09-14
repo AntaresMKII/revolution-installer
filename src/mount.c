@@ -83,7 +83,7 @@ int mount_root(p_list *list)
 
 int mount_setup(p_list *list)
 {
-    char mnt_point[100];
+    char* mnt_point;
     part *curr = list->first;
 
     if (curr == NULL) {

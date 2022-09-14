@@ -22,6 +22,8 @@
 #include <errno.h>
 #include <dirent.h>
 #include <sys/swap.h>
+#include "utils.h"
+#include "my_input.h"
 
 // Structures :
 typedef struct partition_node {
